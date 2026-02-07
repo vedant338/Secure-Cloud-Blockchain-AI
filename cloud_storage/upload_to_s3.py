@@ -10,6 +10,7 @@ import boto3
 from dotenv import load_dotenv
 from security.aes_crypto import encrypt_file
 from security.hash_utils import sha256_hash
+from security.ecdsa_utils import (generate_ecdsa_keypair, sign_hash, verify_signature)
 load_dotenv()
 
 s3 = boto3.client(
@@ -27,6 +28,9 @@ data = b"This is a highly confidential file"
 # Encrypt
 encrypted_data, key, nonce = encrypt_file(data)
 file_hash = sha256_hash(data)
+private_key, public_key = generate_ecdsa_keypair()
+signature = sign_hash(private_key, file_hash)
+is_valid = verify_signature(public_key, file_hash, signature)
 
 # Upload encrypted file
 s3.upload_fileobj(
@@ -37,5 +41,7 @@ s3.upload_fileobj(
 
 print("Encrypted file uploaded to S3 successfully")
 print("SHA-256 Hash of encrypted file:", file_hash)
+print("ECDSA Signature:", signature.hex())
+print("signature valid:", is_valid)
 print("AES Key (store securely):", key)
 print("Nonce:", nonce)
