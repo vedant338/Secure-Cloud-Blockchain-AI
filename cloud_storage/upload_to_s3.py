@@ -1,47 +1,49 @@
-import sys
-from pathlib import Path
-
-ROOT_DIR = Path(__file__).resolve().parent.parent
-sys.path.insert(0,str(ROOT_DIR))
-                
-import os
 import io
 import boto3
-from dotenv import load_dotenv
+from backend.config import Config
 from security.aes_crypto import encrypt_file
 from security.hash_utils import sha256_hash
-from security.ecdsa_utils import (generate_ecdsa_keypair, sign_hash, verify_signature)
-load_dotenv()
+from security.ecdsa_utils import (
+    generate_ecdsa_keypair,
+    sign_hash,
+    verify_signature
+)
 
+# Create S3 client ONCE
 s3 = boto3.client(
     "s3",
-    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
-    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-    region_name=os.getenv("AWS_REGION")
+    aws_access_key_id=Config.AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=Config.AWS_SECRET_ACCESS_KEY,
+    region_name=Config.AWS_REGION
 )
 
-bucket = os.getenv("AWS_BUCKET_NAME")
+def process_and_upload_file(file_bytes: bytes, filename: str):
+    """
+    Encrypts file, hashes it, signs hash, uploads encrypted file to S3
+    """
 
-# Sample data
-data = b"This is a highly confidential file"
+    # Encrypt
+    encrypted_data, key, nonce = encrypt_file(file_bytes)
 
-# Encrypt
-encrypted_data, key, nonce = encrypt_file(data)
-file_hash = sha256_hash(data)
-private_key, public_key = generate_ecdsa_keypair()
-signature = sign_hash(private_key, file_hash)
-is_valid = verify_signature(public_key, file_hash, signature)
+    # Hash original data
+    file_hash = sha256_hash(file_bytes)
 
-# Upload encrypted file
-s3.upload_fileobj(
-    io.BytesIO(encrypted_data),
-    bucket,
-    "encrypted_file.bin"
-)
+    # Sign hash
+    private_key, public_key = generate_ecdsa_keypair()
+    signature = sign_hash(private_key, file_hash)
 
-print("Encrypted file uploaded to S3 successfully")
-print("SHA-256 Hash of encrypted file:", file_hash)
-print("ECDSA Signature:", signature.hex())
-print("signature valid:", is_valid)
-print("AES Key (store securely):", key)
-print("Nonce:", nonce)
+    # Upload encrypted file
+    s3.upload_fileobj(
+        io.BytesIO(encrypted_data),
+        Config.AWS_BUCKET_NAME,
+        filename
+    )
+
+    return {
+        "filename": filename,
+        "hash": file_hash,
+        "signature": signature.hex(),
+        "public_key": public_key.hex(),
+        "aes_key": key.hex(),
+        "nonce": nonce.hex()
+    }
