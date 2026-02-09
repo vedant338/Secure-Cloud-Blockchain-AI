@@ -1,19 +1,14 @@
-from flask import Flask
-from flask_cors import CORS
-from config import Config
+from fastapi import FastAPI
 
 def create_app():
-    app = Flask(__name__)
-    app.config.from_object(Config)
-    CORS(app)
+    app = FastAPI(title="Secure Cloud Blockchain AI")
 
-    # Register routes
-    from routes.health import health_bp
-    app.register_blueprint(health_bp)
+    from backend.routes.health import router as health_router
+    from backend.routes.upload import router as upload_router
+
+    app.include_router(health_router, prefix="/health", tags=["Health"])
+    app.include_router(upload_router, prefix="/upload", tags=["Upload"])
 
     return app
 
 app = create_app()
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
