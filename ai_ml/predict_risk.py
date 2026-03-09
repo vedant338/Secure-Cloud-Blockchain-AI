@@ -1,14 +1,26 @@
 import joblib
 import numpy as np
+from pathlib import Path
 
-model = joblib.load("file_risk_model.pkl")
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR / "model" / "anomaly_model.pkl"
 
-# Example file metadata
-new_file = np.array([[5000, 8, 4, 25, 0]])
+# Load model
+model = joblib.load(MODEL_PATH)
 
-prediction = model.predict(new_file)
+def predict_file_risk(file_size, hash_length, entropy, verified):
+    features = np.array([[file_size, hash_length, entropy, verified]])
+    prediction = model.predict(features)
 
-if prediction[0] == -1:
-    print("HIGH RISK file detected")
-else:
-    print("LOW RISK file")
+    return "SAFE" if prediction[0] == 1 else "SUSPICIOUS"
+
+
+if __name__ == "__main__":
+    result = predict_file_risk(
+        file_size=2048,
+        hash_length=64,
+        entropy=7.9,
+        verified=1
+    )
+
+    print("🔍 AI Risk Prediction:", result)

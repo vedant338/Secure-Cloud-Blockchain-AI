@@ -1,20 +1,24 @@
 import pandas as pd
+from pathlib import Path
 from sklearn.ensemble import IsolationForest
 import joblib
 
-# Load dataset
-data = pd.read_csv("dataset/file_activity.csv")
+BASE_DIR = Path(__file__).resolve().parent
+DATA_PATH = BASE_DIR / "data" / "file_features.csv"
+MODEL_PATH = BASE_DIR / "model" / "anomaly_model.pkl"
 
-# Train model
+data = pd.read_csv(DATA_PATH)
+
+X = data[["file_size", "hash_length", "entropy", "verified"]]
+
 model = IsolationForest(
     n_estimators=100,
     contamination=0.2,
     random_state=42
 )
 
-model.fit(data)
+model.fit(X)
 
-# Save model
-joblib.dump(model, "file_risk_model.pkl")
+joblib.dump(model, MODEL_PATH)
 
-print("AI model trained successfully")
+print("✅ AI model trained & saved successfully")

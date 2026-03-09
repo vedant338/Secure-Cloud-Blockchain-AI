@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GUPTALAYA | BLOCKSTORE</title>
+  <link rel="icon" type="image/png" href="assets/guptalaya-logo.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app">
+    <!-- Login / Register Screen -->
+    <div id="authScreen" class="auth-screen">
+      <div class="auth-container">
+        <div class="auth-brand">
+          <img src="assets/guptalaya-logo.png" alt="GUPTALAYA BLOCKSTORE" class="auth-logo-img">
+          <h1>GUPTALAYA</h1>
+          <p class="auth-tagline">BLOCKSTORE</p>
+        </div>
+        <div class="auth-tabs">
+          <button class="auth-tab active" data-tab="login">Sign in</button>
+          <button class="auth-tab" data-tab="register">Create account</button>
+        </div>
+        <form id="loginForm" class="auth-form">
+          <input type="text" id="loginUsername" placeholder="Username" required autocomplete="username">
+          <input type="password" id="loginPassword" placeholder="Password" required autocomplete="current-password">
+          <p id="authError" class="auth-error hidden"></p>
+          <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+        </form>
+        <form id="registerForm" class="auth-form hidden">
+          <input type="text" id="registerUsername" placeholder="Username" required minlength="3" autocomplete="username">
+          <input type="password" id="registerPassword" placeholder="Password" required minlength="6" autocomplete="new-password">
+          <p id="authErrorReg" class="auth-error hidden"></p>
+          <button type="submit" class="btn btn-primary btn-block">Create account</button>
+        </form>
+      </div>
+      <div class="auth-bg"></div>
+    </div>
+
+    <!-- Main App (after login) -->
+    <div id="appScreen" class="app-screen hidden">
+      <header class="header">
+        <div class="logo">
+          <img src="assets/guptalaya-logo.png" alt="GUPTALAYA" class="logo-img">
+          <div class="logo-text">
+            <h1>GUPTALAYA</h1>
+            <span class="logo-tagline">BLOCKSTORE</span>
+          </div>
+          <span class="health-badge" id="healthBadge" title="Checking...">
+            <span class="health-dot"></span>
+            <span class="health-text">Checking</span>
+          </span>
+        </div>
+        <nav class="nav">
+          <button class="nav-btn active" data-view="home">Home</button>
+          <button class="nav-btn" data-view="upload">Upload</button>
+          <button class="nav-btn" data-view="files">My Files</button>
+          <div class="user-menu-wrap">
+            <button type="button" class="user-trigger" id="userTrigger" title="Account">
+              <span class="user-trigger-name" id="userBadge"></span>
+              <span class="user-trigger-chevron">▼</span>
+            </button>
+            <div class="user-panel hidden" id="userPanel">
+              <div class="user-panel-header">
+                <h4>Account</h4>
+              </div>
+              <div class="user-panel-details">
+                <p><strong>Username:</strong> <span id="userDetailName"></span></p>
+                <p><strong>Member since:</strong> <span id="userDetailJoined"></span></p>
+              </div>
+              <div class="user-panel-section">
+                <h5>Activity</h5>
+                <p class="user-activity"><span id="userLastActive">—</span></p>
+              </div>
+              <div class="user-panel-actions">
+                <button type="button" class="btn btn-secondary btn-sm btn-block" id="helpBtn">Help</button>
+                <button type="button" class="btn btn-ghost btn-sm btn-block" id="logoutBtn">Logout</button>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+      <main class="main">
+        <section id="view-home" class="view active">
+          <div class="hero">
+            <h2>Your files, encrypted & secure</h2>
+            <p>AI-powered risk analysis for every upload. Store and retrieve files with confidence.</p>
+          </div>
+          <div class="quick-actions">
+            <a href="#" class="card" data-view="upload">
+              <span class="card-icon">↑</span>
+              <h3>Upload</h3>
+              <p>Encrypt and store files in the cloud</p>
+            </a>
+            <a href="#" class="card" data-view="files">
+              <span class="card-icon">◇</span>
+              <h3>My Files</h3>
+              <p>View and download your files</p>
+            </a>
+          </div>
+          <div class="recent-files">
+            <h3>Recent uploads</h3>
+            <div id="recentFilesList" class="file-list"></div>
+          </div>
+        </section>
+
+        <section id="view-upload" class="view">
+          <div class="panel">
+            <h2>Upload File</h2>
+            <p class="subtitle">Files are encrypted and analyzed by AI for risk detection.</p>
+            <div class="upload-zone" id="uploadZone">
+              <input type="file" id="fileInput" hidden>
+              <span class="upload-icon">📁</span>
+              <p>Drop a file here or <button type="button" class="link-btn" onclick="document.getElementById('fileInput').click()">browse</button></p>
+            </div>
+            <button class="btn btn-primary" id="uploadBtn" disabled>Upload</button>
+            <div id="uploadResult" class="result-box hidden"></div>
+          </div>
+        </section>
+
+        <section id="view-files" class="view">
+          <div class="panel">
+            <h2>My Files</h2>
+            <p class="subtitle">Your uploaded files. Click Download to retrieve.</p>
+            <div id="filesList" class="file-list detailed"></div>
+            <div id="noFiles" class="empty-state hidden">
+              <p>No files yet. <a href="#" class="link-btn" data-view="upload">Upload your first file</a></p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <p>GUPTALAYA BLOCKSTORE · Encrypted · AI Risk Analysis</p>
+      </footer>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

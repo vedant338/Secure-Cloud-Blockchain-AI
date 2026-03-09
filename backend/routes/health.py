@@ -2,8 +2,9 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
-@router.get("/health", tags=["Health"])
-def health_check():
+@router.get("/")
+def health():
     return {
-        "status": "ok",
+        "status": "UP",
+        "Service": "Secure Cloud Blockchain AI"
     }

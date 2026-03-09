@@ -6,6 +6,7 @@ load_dotenv()
 class Config:
     # App
     ENV = os.getenv("ENV", "development")
+    JWT_SECRET = os.getenv("JWT_SECRET", "secure-cloud-secret-change-in-production")
 
     # AWS
     AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
